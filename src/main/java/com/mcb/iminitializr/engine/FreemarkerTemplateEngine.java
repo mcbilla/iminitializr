@@ -20,7 +20,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine{
     @Override
     public AbstractTemplateEngine doInit(ConfigBuilder configBuilder) {
         configuration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        configuration.setClassForTemplateLoading(FreemarkerTemplateEngine.class, Constant.TEMPLATE_ROOT_PATH);
+        configuration.setClassForTemplateLoading(FreemarkerTemplateEngine.class, Constant.TEMPLATE_PATH);
         configuration.setDefaultEncoding(Constant.UTF8);
         return this;
     }

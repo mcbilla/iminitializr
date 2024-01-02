@@ -12,7 +12,19 @@ public abstract class Constant {
 
     public static final String RESOURCE_ROOT_PATH = "/src/main/resources";
 
-    public static final String TEMPLATE_ROOT_PATH = "/template";
+    public static final String CONTROLLER_PATH = "/controller";
+
+    public static final String SERVICE_PATH = "/service";
+
+    public static final String SERVICE_IMPL_PATH = SERVICE_PATH + "/impl";
+
+    public static final String MAPPER_PATH = "/mapper";
+
+    public static final String XML_PATH = "/mapper";
+
+    public static final String ENTITY_PATH = "/entity";
+
+    public static final String TEMPLATE_PATH = "/template";
 
     /*----------------------------------Template--------------------------------*/
     public static final String JAVA_SUFFIX = ".java";

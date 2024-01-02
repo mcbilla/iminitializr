@@ -1,21 +1,11 @@
 package com.mcb.iminitializr.utils;
 
+import com.mcb.iminitializr.constant.Constant;
+
 import java.io.File;
 import java.io.IOException;
 
 public class FileUtils {
-
-    /**
-     * Makes a directory, including any necessary but nonexistent parent
-     * directories. If a file already exists with specified name but it is
-     * not a directory then an IOException is thrown.
-     * If the directory cannot be created (or does not already exist)
-     * then an IOException is thrown.
-     *
-     * @param directory directory to create, must not be {@code null}
-     * @throws NullPointerException if the directory is {@code null}
-     * @throws IOException          if the directory cannot be created or the file already exists but is not a directory
-     */
     public static void forceMkdir(final File directory) throws IOException {
         if (directory.exists()) {
             if (!directory.isDirectory()) {
@@ -40,20 +30,22 @@ public class FileUtils {
     }
 
     /**
-     * Makes any necessary but nonexistent parent directories for a given File. If the parent directory cannot be
-     * created then an IOException is thrown.
-     *
-     * @param file file with parent to create, must not be {@code null}
-     * @throws NullPointerException if the file is {@code null}
-     * @throws IOException          if the parent directory cannot be created
-     * @since 2.5
+     * 分隔符转驼峰式
+     * @param source
+     * @param separator
+     * @return
      */
-    public static void forceMkdirParent(final File file) throws IOException {
-        final File parent = file.getParentFile();
-        if (parent == null) {
-            return;
+    public static String separatorToCamel(String source, String separator) {
+        StringBuffer target = new StringBuffer();
+        String[] split = source.split(separator);
+        for (String s : split) {
+            s = s.toLowerCase();
+            target.append(s.substring(0, 1).toUpperCase()).append(s.substring(1));
         }
-        forceMkdir(parent);
+        return target.toString();
     }
 
+    public static String separatorToCamel(String source, String separator, String suffix) {
+        return separatorToCamel(source, separator) + suffix;
+    }
 }

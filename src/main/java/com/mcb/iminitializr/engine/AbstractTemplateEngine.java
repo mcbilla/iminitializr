@@ -3,19 +3,23 @@ package com.mcb.iminitializr.engine;
 import com.mcb.iminitializr.config.ConfigBuilder;
 import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.constant.Constant;
+import com.mcb.iminitializr.constant.PathEnum;
+import com.mcb.iminitializr.support.PathFactory;
+import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
-import org.apache.tomcat.util.buf.StringUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractTemplateEngine {
+public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     private ConfigBuilder configBuilder;
+
+    private PathFactory<PathEnum> pathFactory;
 
     public AbstractTemplateEngine init(ConfigBuilder configBuilder) {
         this.configBuilder = configBuilder;
+        this.pathFactory = new PathFactoryImpl(configBuilder.getGlobalConfig());
         return doInit(configBuilder);
     }
 
@@ -27,32 +31,24 @@ public abstract class AbstractTemplateEngine {
     }
 
     /**
-     * 创建启动文件
+     * 创建整体项目
      *
      * @param config
      */
     private void generateProject(ConfigBuilder config) {
         GlobalConfig globalConfig = config.getGlobalConfig();
-        String groupId = globalConfig.getGroupId();
-        String artifactId = globalConfig.getArtifactId();
-        // 获取包名，逗号隔开
-        String packageName = groupId + Constant.DOT + artifactId.replace(Constant.DASH, Constant.DOT);
-        // 把包名转换成路径，文件分隔符隔开
-        String packagePath = packageName.replace(Constant.DOT, File.separator);
         // 获取文件名，大写开头驼峰式
-        StringBuffer applicationName = new StringBuffer();
-        String[] split = artifactId.split(Constant.DASH);
-        for (String s : split) {
-            applicationName.append(s.substring(0, 1).toUpperCase()).append(s.substring(1));
-        }
-        applicationName.append(Constant.APPLICATION_NAME);
-        // 完整文件名，根路径 + 包路径 + 文件名
-        String fileName = StringUtils.join(Arrays.asList(globalConfig.getOutputDir(), packagePath, applicationName.append(Constant.JAVA_SUFFIX).toString()),
-                File.separatorChar);
+        String applicationName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.APPLICATION_NAME + Constant.JAVA_SUFFIX);
+        // 获取包名
+        String packageVal = getPackage(PathEnum.pkg);
+        // 获取包路径
+        String packagePath = getPath(PathEnum.pkg);
+        // 完整文件名，包路径 + 文件名
+        String fileName = packagePath + File.separatorChar + applicationName;
         File file = new File(fileName);
         Map<String, Object> objectMap = new HashMap<>();
         objectMap.put("applicationName", applicationName);
-        objectMap.put("packageName", packageName);
+        objectMap.put("packageName", packageVal);
         this.outputFile(file, objectMap, getTemplatePath(Constant.APPLICATION_TEMPLATE));
     }
 
@@ -73,6 +69,16 @@ public abstract class AbstractTemplateEngine {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String getPath(PathEnum pathEnum) {
+        return this.pathFactory.getPath(pathEnum);
+    }
+
+    @Override
+    public String getPackage(PathEnum pathEnum) {
+        return this.pathFactory.getPackage(pathEnum);
     }
 
     public ConfigBuilder getConfigBuilder() {
