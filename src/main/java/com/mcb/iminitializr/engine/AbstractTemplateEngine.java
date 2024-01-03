@@ -1,6 +1,10 @@
 package com.mcb.iminitializr.engine;
 
+import com.baomidou.mybatisplus.generator.AutoGenerator;
+import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.mcb.iminitializr.config.ConfigBuilder;
+import com.mcb.iminitializr.config.DataSourceConfig;
 import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.constant.Constant;
 import com.mcb.iminitializr.constant.PathEnum;
@@ -8,7 +12,9 @@ import com.mcb.iminitializr.support.PathFactory;
 import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,7 +34,8 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
         ConfigBuilder config = this.getConfigBuilder();
         // 创建整体项目
         generateProject(config);
-        // TODO 创建其他内容
+        // 创建MVC结构
+        generateMVC(config);
     }
 
     /**
@@ -74,6 +81,31 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
         String gitignoreFileName = rootPath + File.separatorChar + Constant.GITIGNORE_NAME;
         this.outputFile(new File(gitignoreFileName), Constant.GITIGNORE_TEMPLATE, null);
 
+    }
+
+    /**
+     * 基于 mybatis-plus-generator，创建MVC结构
+     * @param config
+     */
+    private void generateMVC(ConfigBuilder config) {
+        GlobalConfig globalConfig = config.getGlobalConfig();
+        DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
+
+        new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(
+                dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()
+        )
+                .build())
+                .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
+                        .author(globalConfig.getAuthor()) // 设置作者
+                        .enableSwagger() // 开启 swagger 模式
+                        .outputDir(getPath(PathEnum.pkg)) // 指定输出目录
+                        .build())
+                .packageInfo(new PackageConfig.Builder()
+                        .parent(getPackage(PathEnum.pkg)) // 设置父包名
+                        .pathInfo(Collections.singletonMap(OutputFile.xml, getPath(PathEnum.xml))) // 设置mapperXml生成路径
+                        .build())
+                .strategy(config.getStrategyConfig())
+                .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
     }
 
     /**

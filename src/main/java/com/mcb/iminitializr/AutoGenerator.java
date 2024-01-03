@@ -1,6 +1,8 @@
 package com.mcb.iminitializr;
 
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.mcb.iminitializr.config.ConfigBuilder;
+import com.mcb.iminitializr.config.DataSourceConfig;
 import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.engine.AbstractTemplateEngine;
 import com.mcb.iminitializr.engine.FreemarkerTemplateEngine;
@@ -20,10 +22,16 @@ public class AutoGenerator {
 
     private final GlobalConfig.Builder globalConfigBuilder;
 
+    private final DataSourceConfig.Builder dataSourceConfigBuilder;
+
+    private final StrategyConfig.Builder strategyConfigBuilder;
+
     private AbstractTemplateEngine templateEngine = new FreemarkerTemplateEngine();
 
     public AutoGenerator() {
         this.globalConfigBuilder = new GlobalConfig.Builder();
+        this.dataSourceConfigBuilder = new DataSourceConfig.Builder();
+        this.strategyConfigBuilder = new StrategyConfig.Builder();
     }
 
     public static AutoGenerator create() {
@@ -35,11 +43,25 @@ public class AutoGenerator {
         return this;
     }
 
+    public AutoGenerator dataSourceConfigBuilder(Consumer<DataSourceConfig.Builder> consumer) {
+        consumer.accept(this.dataSourceConfigBuilder);
+        return this;
+    }
+
+    public AutoGenerator strategyConfigBuilder(Consumer<StrategyConfig.Builder> consumer) {
+        consumer.accept(this.strategyConfigBuilder);
+        return this;
+    }
+
     public void execute() {
-        logger.debug("==========================准备生成文件...==========================");
-        config = new ConfigBuilder(this.globalConfigBuilder.build());
+        logger.debug("==========================开始创建项目==========================");
+        config = new ConfigBuilder(
+                this.globalConfigBuilder.build(),
+                this.dataSourceConfigBuilder.build(),
+                this.strategyConfigBuilder.build()
+        );
         templateEngine.init(config).generate();
-        logger.debug("==========================文件生成完成！！！==========================");
+        logger.debug("==========================创建项目完成==========================");
     }
 
 }

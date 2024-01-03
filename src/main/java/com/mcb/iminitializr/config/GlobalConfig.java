@@ -18,6 +18,9 @@ public class GlobalConfig {
 
     private String author;
 
+    private GlobalConfig() {
+    }
+
     public String getOutputDir() {
         return outputDir;
     }

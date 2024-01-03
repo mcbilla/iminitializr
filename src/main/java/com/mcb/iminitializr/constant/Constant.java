@@ -24,7 +24,7 @@ public abstract class Constant {
 
     public static final String ENTITY_PATH = "/entity";
 
-    public static final String TEMPLATE_PATH = "/template";
+    public static final String TEMPLATE_PATH = "/templates";
 
     /*----------------------------------Template--------------------------------*/
     public static final String JAVA_SUFFIX = ".java";
