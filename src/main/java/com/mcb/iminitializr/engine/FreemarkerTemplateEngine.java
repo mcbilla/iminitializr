@@ -35,7 +35,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine{
     }
 
     @Override
-    public String getTemplatePath(String temlateName) {
+    public String doGetTemplatePath(String temlateName) {
         return temlateName + Constant.FREEMARKER_SUFFIX;
     }
 }

@@ -11,6 +11,7 @@ import com.mcb.iminitializr.utils.FileUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     private ConfigBuilder configBuilder;
@@ -31,33 +32,58 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     }
 
     /**
-     * 创建整体项目
+     * 创建项目整体架构，包括application、yml、pom、.gitignore
      *
      * @param config
      */
     private void generateProject(ConfigBuilder config) {
         GlobalConfig globalConfig = config.getGlobalConfig();
-        // 获取文件名，大写开头驼峰式
-        String applicationName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.APPLICATION_NAME + Constant.JAVA_SUFFIX);
-        // 获取包名
-        String packageVal = getPackage(PathEnum.pkg);
+        // 获取根目录路径
+        String rootPath = getPath(PathEnum.root);
         // 获取包路径
         String packagePath = getPath(PathEnum.pkg);
+        // 获取资源路径
+        String resourcePath = getPath(PathEnum.resource);
+
+        // 1、创建application
+        // 获取文件名，大写开头驼峰式
+        String applicationName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.APPLICATION_NAME + Constant.JAVA_SUFFIX);
         // 完整文件名，包路径 + 文件名
-        String fileName = packagePath + File.separatorChar + applicationName;
-        File file = new File(fileName);
-        Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("applicationName", applicationName);
-        objectMap.put("packageName", packageVal);
-        this.outputFile(file, objectMap, getTemplatePath(Constant.APPLICATION_TEMPLATE));
+        String appFileName = packagePath + File.separatorChar + applicationName;
+        this.outputFile(new File(appFileName), Constant.APPLICATION_TEMPLATE, builder -> builder
+                .put("applicationName", applicationName)
+                .put("packageName", getPackage(PathEnum.pkg))
+                .getAll());
+
+        // 2、创建yml
+        String ymlFileName = resourcePath + File.separatorChar + Constant.YML_NAME;
+        this.outputFile(new File(ymlFileName), Constant.YML_TEMPLATE, null);
+
+        // 3、创建pom
+        String pomFileName = rootPath + File.separatorChar + Constant.POM_NAME;
+        this.outputFile(new File(pomFileName), Constant.POM_TEMPLATE, builder -> builder
+                .put("groupId", globalConfig.getGroupId())
+                .put("artifactId", globalConfig.getArtifactId())
+                .put("version", globalConfig.getVersion())
+                .put("name", globalConfig.getName())
+                .put("description", globalConfig.getDescription())
+                .getAll()
+        );
+
+        // 4、创建.gitignore
+        String gitignoreFileName = rootPath + File.separatorChar + Constant.GITIGNORE_NAME;
+        this.outputFile(new File(gitignoreFileName), Constant.GITIGNORE_TEMPLATE, null);
+
     }
 
     /**
+     * 输出文件
+     *
      * @param file
-     * @param objectMap
-     * @param templatePath
+     * @param templateName
+     * @param objectMapBuilder
      */
-    protected void outputFile(File file, Map<String, Object> objectMap, String templatePath) {
+    protected void outputFile(File file, String templateName, Function<ObjectMapBuilder, Map<String, Object>> objectMapBuilder) {
         try {
             // 全局判断【默认】
             boolean exist = file.exists();
@@ -65,7 +91,8 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
                 File parentFile = file.getParentFile();
                 FileUtils.forceMkdir(parentFile);
             }
-            doWrite(objectMap, templatePath, file);
+            Map<String, Object> objectMap = objectMapBuilder != null ? objectMapBuilder.apply(new ObjectMapBuilder()) : null;
+            doWrite(objectMap, doGetTemplatePath(templateName), file);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,6 +112,12 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
         return configBuilder;
     }
 
+    /**
+     * 模板引擎初始化
+     *
+     * @param configBuilder
+     * @return
+     */
     public abstract AbstractTemplateEngine doInit(ConfigBuilder configBuilder);
 
     /**
@@ -97,5 +130,27 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
      */
     protected abstract void doWrite(Map<String, Object> objectMap, String templatePath, File file) throws Exception;
 
-    public abstract String getTemplatePath(String temlateName);
+    /**
+     * 获取带引擎后缀的模板名
+     *
+     * @param temlateName
+     * @return
+     */
+    public abstract String doGetTemplatePath(String temlateName);
+
+    /**
+     * 作用是为了使用lambda表达式创建objectMap
+     */
+    class ObjectMapBuilder {
+        private Map<String, Object> objectMap = new HashMap<>();
+
+        public ObjectMapBuilder put(String key, Object obj) {
+            objectMap.putIfAbsent(key, obj);
+            return this;
+        }
+
+        public Map<String, Object> getAll() {
+            return this.objectMap;
+        }
+    }
 }

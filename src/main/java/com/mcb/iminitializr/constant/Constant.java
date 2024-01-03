@@ -35,6 +35,18 @@ public abstract class Constant {
 
     public static final String APPLICATION_NAME = "Application";
 
+    public static final String YML_TEMPLATE = "application.yml";
+
+    public static final String YML_NAME = "application.yml";
+
+    public static final String POM_TEMPLATE = "pom.xml";
+
+    public static final String POM_NAME = "pom.xml";
+
+    public static final String GITIGNORE_TEMPLATE = ".gitignore";
+
+    public static final String GITIGNORE_NAME = ".gitignore";
+
     /*----------------------------------String--------------------------------*/
 
     public static final String AMPERSAND = "&";

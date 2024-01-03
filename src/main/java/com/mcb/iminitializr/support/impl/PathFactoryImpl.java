@@ -4,7 +4,6 @@ import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.constant.Constant;
 import com.mcb.iminitializr.constant.PathEnum;
 import com.mcb.iminitializr.support.PathFactory;
-import com.mcb.iminitializr.utils.FileUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -58,7 +57,6 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
         // com/mcb/xxx -> com.mcb.xxx
         return pkg.replaceAll(File.separator, Constant.DOT);
     }
-
 
     @Override
     public String getPath(PathEnum path) {
