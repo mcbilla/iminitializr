@@ -12,7 +12,6 @@ import com.mcb.iminitializr.support.PathFactory;
 import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,52 +38,73 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     }
 
     /**
-     * 创建项目整体架构，包括application、yml、pom、.gitignore
+     * 创建项目整体架构，包括application、package-info、test、yml、pom、.gitignore
      *
      * @param config
      */
     private void generateProject(ConfigBuilder config) {
         GlobalConfig globalConfig = config.getGlobalConfig();
-        // 获取根目录路径
+        // 根目录路径
         String rootPath = getPath(PathEnum.root);
-        // 获取包路径
+        // java包路径
         String packagePath = getPath(PathEnum.pkg);
-        // 获取资源路径
+        // java资源路径
         String resourcePath = getPath(PathEnum.resource);
+        // 测试包路径
+        String testPackagePath = getPath(PathEnum.test_pkg);
 
         // 1、创建application
-        // 获取文件名，大写开头驼峰式
-        String applicationName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.APPLICATION_NAME + Constant.JAVA_SUFFIX);
-        // 完整文件名，包路径 + 文件名
-        String appFileName = packagePath + File.separatorChar + applicationName;
-        this.outputFile(new File(appFileName), Constant.APPLICATION_TEMPLATE, builder -> builder
-                .put("applicationName", applicationName)
-                .put("packageName", getPackage(PathEnum.pkg))
-                .getAll());
+        // 获取application名，大写开头驼峰式
+        String applicationName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.APPLICATION_NAME);
+        this.outputFile(createFile(packagePath, applicationName, Constant.JAVA_SUFFIX),
+                Constant.APPLICATION_TEMPLATE,
+                builder -> builder
+                        .put("applicationName", applicationName)
+                        .put("packageName", getPackage(PathEnum.pkg))
+                        .getAll());
 
-        // 2、创建yml
-        String ymlFileName = resourcePath + File.separatorChar + Constant.YML_NAME;
-        this.outputFile(new File(ymlFileName), Constant.YML_TEMPLATE, null);
+        // 2、创建package-info
+        this.outputFile(createFile(packagePath, Constant.PACKAGE_INFO_TEMPLATE, null),
+                Constant.PACKAGE_INFO_TEMPLATE,
+                builder -> builder
+                        .put("packageName", getPackage(PathEnum.pkg))
+                        .getAll());
 
-        // 3、创建pom
-        String pomFileName = rootPath + File.separatorChar + Constant.POM_NAME;
-        this.outputFile(new File(pomFileName), Constant.POM_TEMPLATE, builder -> builder
-                .put("groupId", globalConfig.getGroupId())
-                .put("artifactId", globalConfig.getArtifactId())
-                .put("version", globalConfig.getVersion())
-                .put("name", globalConfig.getName())
-                .put("description", globalConfig.getDescription())
-                .getAll()
+        // 3、创建test
+        String testName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.TEST_NAME);
+        this.outputFile(createFile(testPackagePath, testName, Constant.JAVA_SUFFIX),
+                Constant.TEST_TEMPLATE,
+                builder -> builder
+                        .put("testName", testName)
+                        .put("packageName", getPackage(PathEnum.test_pkg))
+                        .getAll());
+
+        // 4、创建yml
+        this.outputFile(createFile(resourcePath, Constant.YML_TEMPLATE, null),
+                Constant.YML_TEMPLATE,
+                null);
+
+        // 5、创建pom
+        this.outputFile(createFile(rootPath, Constant.POM_TEMPLATE, null),
+                Constant.POM_TEMPLATE,
+                builder -> builder
+                        .put("groupId", globalConfig.getGroupId())
+                        .put("artifactId", globalConfig.getArtifactId())
+                        .put("version", globalConfig.getVersion())
+                        .put("name", globalConfig.getName())
+                        .put("description", globalConfig.getDescription())
+                        .getAll()
         );
 
-        // 4、创建.gitignore
-        String gitignoreFileName = rootPath + File.separatorChar + Constant.GITIGNORE_NAME;
-        this.outputFile(new File(gitignoreFileName), Constant.GITIGNORE_TEMPLATE, null);
-
+        // 6、创建.gitignore
+        this.outputFile(createFile(rootPath, Constant.GITIGNORE_TEMPLATE, null),
+                Constant.GITIGNORE_TEMPLATE,
+                null);
     }
 
     /**
-     * 基于 mybatis-plus-generator，创建MVC结构
+     * 基于mybatis-plus-generator，创建MVC结构
+     *
      * @param config
      */
     private void generateMVC(ConfigBuilder config) {
@@ -93,8 +113,7 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
 
         new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(
                 dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()
-        )
-                .build())
+        ).build())
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
                         .author(globalConfig.getAuthor()) // 设置作者
                         .enableSwagger() // 开启 swagger 模式
@@ -106,6 +125,23 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
                         .build())
                 .strategy(config.getStrategyConfig())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
+    }
+
+    /**
+     * 创建java文件
+     *
+     * @param path   绝对路径
+     * @param name   文件名
+     * @param suffix 文件名后缀
+     * @return
+     */
+    private File createFile(String path, String name, String suffix) {
+        StringBuffer sb = new StringBuffer()
+                .append(path)
+                .append(File.separatorChar)
+                .append(name)
+                .append(suffix != null ? suffix : "");
+        return new File(sb.toString());
     }
 
     /**

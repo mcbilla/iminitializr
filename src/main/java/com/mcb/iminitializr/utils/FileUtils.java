@@ -45,6 +45,13 @@ public class FileUtils {
         return target.toString();
     }
 
+    /**
+     * 分隔符转驼峰式+后缀
+     * @param source
+     * @param separator
+     * @param suffix
+     * @return
+     */
     public static String separatorToCamel(String source, String separator, String suffix) {
         return separatorToCamel(source, separator) + suffix;
     }

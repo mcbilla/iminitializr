@@ -7,45 +7,56 @@ public abstract class Constant {
     /*----------------------------------Basic--------------------------------*/
 
     public static String UTF8 = StandardCharsets.UTF_8.name();
-
     public static final String JAVA_ROOT_PATH = "/src/main/java";
-
     public static final String RESOURCE_ROOT_PATH = "/src/main/resources";
 
+    public static final String TEST_JAVA_ROOT_PATH = "/src/test/java";
+    public static final String TEST_RESOURCE_ROOT_PATH = "/src/test/resources";
+
+    public static final String TEST_PATH = "/test";
     public static final String CONTROLLER_PATH = "/controller";
-
     public static final String SERVICE_PATH = "/service";
-
     public static final String SERVICE_IMPL_PATH = SERVICE_PATH + "/impl";
-
     public static final String MAPPER_PATH = "/mapper";
-
     public static final String XML_PATH = "/mapper";
-
     public static final String ENTITY_PATH = "/entity";
-
     public static final String TEMPLATE_PATH = "/templates";
+    public static final String CONFIG_PATH = "/config";
+    public static final String INTERCEPTOR_PATH = "/interceptor";
+    public static final String DTO_PATH = "/dto";
+    public static final String GLOBAL_PATH = "/global";
+    public static final String CONSTANT_PATH = "/constant";
+    public static final String EXCEPTION_PATH = "/exception";
 
     /*----------------------------------Template--------------------------------*/
-    public static final String JAVA_SUFFIX = ".java";
-
     public static final String FREEMARKER_SUFFIX = ".ftl";
-
     public static final String APPLICATION_TEMPLATE = "application.java";
-
-    public static final String APPLICATION_NAME = "Application";
-
+    public static final String PACKAGE_INFO_TEMPLATE = "package-info.java";
+    public static final String TEST_TEMPLATE = "test.java";
     public static final String YML_TEMPLATE = "application.yml";
-
-    public static final String YML_NAME = "application.yml";
-
     public static final String POM_TEMPLATE = "pom.xml";
-
-    public static final String POM_NAME = "pom.xml";
-
     public static final String GITIGNORE_TEMPLATE = ".gitignore";
+    public static final String CONFIG_TEMPLATE = "config.java.ftl";
+    public static final String INTERCEPTOR_TEMPLATE = "interceptor.java";
+    public static final String DTO_TEMPLATE = "dto.java";
+    public static final String GLOBAL_EXCEPTION_TEMPLATE = "global.exception.java";
+    public static final String GLOBAL_ADVICE_TEMPLATE = "global.advice.java";
+    public static final String GLOBAL_RESULT_TEMPLATE = "global.result.java";
+    public static final String CONSTANT_TEMPLATE = "constant.java";
+    public static final String EXCEPTION_TEMPLATE = "exception.java";
 
-    public static final String GITIGNORE_NAME = ".gitignore";
+    /*----------------------------------Java File--------------------------------*/
+    public static final String JAVA_SUFFIX = ".java";
+    public static final String APPLICATION_NAME = "Application";
+    public static final String TEST_NAME = "ApplicationTests";
+    public static final String CONFIG_NAME = "WebConfig";
+    public static final String INTERCEPTOR_NAME = "LogInterceptor";
+    public static final String DTO_NAME = "HelloDTO";
+    public static final String GLOBAL_EXCEPTION_NAME = "GlobalExceptionHandler";
+    public static final String GLOBAL_ADVICE_NAME = "GlobalResponseBodyAdvice";
+    public static final String GLOBAL_RESULT_NAME = "Result";
+    public static final String CONSTANT_NAME = "Constant";
+    public static final String EXCEPTION_NAME = "BusnessException";
 
     /*----------------------------------String--------------------------------*/
 

@@ -28,14 +28,21 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
         // 获取包路径，/com/mcb
         String packagePath = File.separator + packageVal.replace(Constant.DOT, File.separator);
 
-        handlePathAndPackageMap(rootPath, packagePath);
+        handlePathMap(rootPath, packagePath);
+        handlePackageMap();
     }
 
-    private void handlePathAndPackageMap(String rootPath, String packagePath) {
+    private void handlePathMap(String rootPath, String packagePath) {
+        // 项目基本路径
         this.pathMap.put(PathEnum.root, rootPath);
         this.pathMap.put(PathEnum.java, getPath(PathEnum.root) + Constant.JAVA_ROOT_PATH);
         this.pathMap.put(PathEnum.resource, getPath(PathEnum.root) + Constant.RESOURCE_ROOT_PATH);
         this.pathMap.put(PathEnum.pkg, getPath(PathEnum.java) + packagePath);
+        this.pathMap.put(PathEnum.test_java, getPath(PathEnum.root) + Constant.TEST_JAVA_ROOT_PATH);
+        this.pathMap.put(PathEnum.test_resource, getPath(PathEnum.root) + Constant.TEST_RESOURCE_ROOT_PATH);
+        this.pathMap.put(PathEnum.test_pkg, getPath(PathEnum.test_java) + packagePath + Constant.TEST_PATH);
+
+        // MVC层路径
         this.pathMap.put(PathEnum.controller, getPath(PathEnum.pkg) + Constant.CONTROLLER_PATH);
         this.pathMap.put(PathEnum.service, getPath(PathEnum.pkg) + Constant.SERVICE_PATH);
         this.pathMap.put(PathEnum.serviceImpl, getPath(PathEnum.pkg) + Constant.SERVICE_IMPL_PATH);
@@ -43,12 +50,31 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
         this.pathMap.put(PathEnum.xml, getPath(PathEnum.resource) + Constant.XML_PATH);
         this.pathMap.put(PathEnum.entity, getPath(PathEnum.pkg) + Constant.ENTITY_PATH);
 
+        // 项目扩展路径
+        this.pathMap.put(PathEnum.config, getPath(PathEnum.pkg) + Constant.CONFIG_PATH);
+        this.pathMap.put(PathEnum.interceptor, getPath(PathEnum.pkg) + Constant.INTERCEPTOR_PATH);
+        this.pathMap.put(PathEnum.dto, getPath(PathEnum.pkg) + Constant.DTO_PATH);
+        this.pathMap.put(PathEnum.global, getPath(PathEnum.pkg) + Constant.GLOBAL_PATH);
+        this.pathMap.put(PathEnum.constant, getPath(PathEnum.pkg) + Constant.CONSTANT_PATH);
+        this.pathMap.put(PathEnum.exception, getPath(PathEnum.pkg) + Constant.EXCEPTION_PATH);
+    }
+
+    private void handlePackageMap() {
         this.packageMap.put(PathEnum.pkg, pathToPackage(this.pathMap.get(PathEnum.pkg)));
+        this.packageMap.put(PathEnum.test_pkg, pathToPackage(this.pathMap.get(PathEnum.test_pkg)));
+
         this.packageMap.put(PathEnum.controller, pathToPackage(this.pathMap.get(PathEnum.controller)));
         this.packageMap.put(PathEnum.service, pathToPackage(this.pathMap.get(PathEnum.service)));
         this.packageMap.put(PathEnum.serviceImpl, pathToPackage(this.pathMap.get(PathEnum.serviceImpl)));
         this.packageMap.put(PathEnum.mapper, pathToPackage(this.pathMap.get(PathEnum.mapper)));
         this.packageMap.put(PathEnum.entity, pathToPackage(this.pathMap.get(PathEnum.entity)));
+
+        this.packageMap.put(PathEnum.config, pathToPackage(this.pathMap.get(PathEnum.config)));
+        this.packageMap.put(PathEnum.interceptor, pathToPackage(this.pathMap.get(PathEnum.interceptor)));
+        this.packageMap.put(PathEnum.dto, pathToPackage(this.pathMap.get(PathEnum.dto)));
+        this.packageMap.put(PathEnum.global, pathToPackage(this.pathMap.get(PathEnum.global)));
+        this.packageMap.put(PathEnum.constant, pathToPackage(this.pathMap.get(PathEnum.constant)));
+        this.packageMap.put(PathEnum.exception, pathToPackage(this.pathMap.get(PathEnum.exception)));
     }
 
     private String pathToPackage(String s) {
