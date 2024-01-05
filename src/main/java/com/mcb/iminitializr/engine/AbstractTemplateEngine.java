@@ -8,33 +8,65 @@ import com.mcb.iminitializr.config.DataSourceConfig;
 import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.constant.Constant;
 import com.mcb.iminitializr.constant.PathEnum;
+import com.mcb.iminitializr.extension.ExtensionHandler;
+import com.mcb.iminitializr.support.ExtensionFactory;
 import com.mcb.iminitializr.support.PathFactory;
+import com.mcb.iminitializr.support.PathFactoryAware;
+import com.mcb.iminitializr.support.impl.ExtensionFactoryImpl;
 import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
+public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, ExtensionFactory<ExtensionHandler> {
     private ConfigBuilder configBuilder;
 
     private PathFactory<PathEnum> pathFactory;
 
+    private ExtensionFactory<ExtensionHandler> extensionFactory;
+
     public AbstractTemplateEngine init(ConfigBuilder configBuilder) {
         this.configBuilder = configBuilder;
-        this.pathFactory = new PathFactoryImpl(configBuilder.getGlobalConfig());
+        this.pathFactory = preparePathFactory();
+        this.extensionFactory = prepareExtensionFactory();
         return doInit(configBuilder);
+    }
+
+    private PathFactory<PathEnum> preparePathFactory() {
+        return new PathFactoryImpl(this.configBuilder.getGlobalConfig());
+    }
+
+    private ExtensionFactory<ExtensionHandler> prepareExtensionFactory() {
+        ExtensionFactory<ExtensionHandler> extensionFactory = new ExtensionFactoryImpl();
+        invokeAwareInterfaces(extensionFactory);
+        return extensionFactory;
+    }
+
+    private void invokeAwareInterfaces(ExtensionFactory<ExtensionHandler> extensionFactory) {
+        List<ExtensionHandler> extensions = extensionFactory.getExtensions();
+        if (extensions != null) {
+            extensions.forEach(e -> {
+                if (PathFactoryAware.class.isAssignableFrom(e.getClass())) {
+                    ((PathFactoryAware) e).setPathFactory(this.pathFactory);
+                }
+            });
+        }
     }
 
     public void generate() {
         ConfigBuilder config = this.getConfigBuilder();
         // 创建整体项目
         generateProject(config);
-        // 创建MVC结构
+        // 创建基本MVC结构
         generateMVC(config);
+        // 创建扩展
+        generateExtension(config);
     }
 
     /**
@@ -108,23 +140,27 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
      * @param config
      */
     private void generateMVC(ConfigBuilder config) {
-        GlobalConfig globalConfig = config.getGlobalConfig();
         DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
+        Assert.noNullElements(new String[]{dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()}, "数据库连接信息不能为空");
 
         new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(
                 dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()
         ).build())
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
-                        .author(globalConfig.getAuthor()) // 设置作者
+                        .author(config.getGlobalConfig().getAuthor()) // 设置作者
                         .enableSwagger() // 开启 swagger 模式
                         .outputDir(getPath(PathEnum.pkg)) // 指定输出目录
                         .build())
                 .packageInfo(new PackageConfig.Builder()
                         .parent(getPackage(PathEnum.pkg)) // 设置父包名
-                        .pathInfo(Collections.singletonMap(OutputFile.xml, getPath(PathEnum.xml))) // 设置mapperXml生成路径
+                        .pathInfo(Collections.singletonMap(OutputFile.xml, getPath(PathEnum.resource) + Constant.XML_PATH)) // 设置mapperXml生成路径
                         .build())
                 .strategy(config.getStrategyConfig())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
+    }
+
+    private void generateExtension(ConfigBuilder config) {
+
     }
 
     /**
@@ -145,7 +181,7 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     }
 
     /**
-     * 输出文件
+     * 使用模板引擎渲染并输出文件
      *
      * @param file
      * @param templateName
@@ -174,6 +210,16 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum> {
     @Override
     public String getPackage(PathEnum pathEnum) {
         return this.pathFactory.getPackage(pathEnum);
+    }
+
+    @Override
+    public ExtensionHandler getExtension(String name) {
+        return this.extensionFactory.getExtension(name);
+    }
+
+    @Override
+    public List<ExtensionHandler> getExtensions() {
+        return this.extensionFactory.getExtensions();
     }
 
     public ConfigBuilder getConfigBuilder() {
