@@ -1,10 +1,9 @@
 package com.mcb.iminitializr.support.impl;
 
-import com.mcb.iminitializr.constant.PathEnum;
 import com.mcb.iminitializr.extension.ExtensionHandler;
 import com.mcb.iminitializr.support.ExtensionFactory;
-import com.mcb.iminitializr.support.PathFactory;
-import com.mcb.iminitializr.support.PathFactoryAware;
+import com.mcb.iminitializr.support.RuntimeFactory;
+import com.mcb.iminitializr.extension.RuntimeFactoryAware;
 import com.mcb.iminitializr.utils.ClassUtils;
 
 import java.util.ArrayList;
@@ -16,14 +15,14 @@ import java.util.stream.Collectors;
 
 public class ExtensionFactoryImpl implements ExtensionFactory<ExtensionHandler> {
 
-    private PathFactory<PathEnum> pathFactory;
+    private RuntimeFactory runtimeFactory;
 
     private List<ExtensionHandler> extensionHandlerList = new ArrayList<>();
 
     private Map<String, ExtensionHandler> extensionHandlerMap = new HashMap<>();
 
-    public ExtensionFactoryImpl(PathFactory<PathEnum> pathFactory) {
-        this.pathFactory = pathFactory;
+    public ExtensionFactoryImpl(RuntimeFactory runtimeFactory) {
+        this.runtimeFactory = runtimeFactory;
         this.extensionHandlerList = initExtensionHandlerList();
         this.extensionHandlerMap = initExtensionHandlerMap();
     }
@@ -43,8 +42,8 @@ public class ExtensionFactoryImpl implements ExtensionFactory<ExtensionHandler> 
 
     private void invokeAwareInterfaces(List<ExtensionHandler> extensionHandlers) {
         extensionHandlers.forEach(e -> {
-            if (PathFactoryAware.class.isAssignableFrom(e.getClass())) {
-                ((PathFactoryAware) e).setPathFactory(this.pathFactory);
+            if (RuntimeFactoryAware.class.isAssignableFrom(e.getClass())) {
+                ((RuntimeFactoryAware) e).setPathFactory(this.runtimeFactory);
             }
         });
     }

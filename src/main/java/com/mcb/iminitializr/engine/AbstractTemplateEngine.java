@@ -1,8 +1,10 @@
 package com.mcb.iminitializr.engine;
 
 import com.baomidou.mybatisplus.generator.AutoGenerator;
+import com.baomidou.mybatisplus.generator.config.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.builder.CustomFile;
 import com.mcb.iminitializr.config.ConfigBuilder;
 import com.mcb.iminitializr.config.DataSourceConfig;
 import com.mcb.iminitializr.config.GlobalConfig;
@@ -10,9 +12,9 @@ import com.mcb.iminitializr.constant.Constant;
 import com.mcb.iminitializr.constant.PathEnum;
 import com.mcb.iminitializr.extension.ExtensionHandler;
 import com.mcb.iminitializr.support.ExtensionFactory;
-import com.mcb.iminitializr.support.PathFactory;
+import com.mcb.iminitializr.support.RuntimeFactory;
 import com.mcb.iminitializr.support.impl.ExtensionFactoryImpl;
-import com.mcb.iminitializr.support.impl.PathFactoryImpl;
+import com.mcb.iminitializr.support.impl.RuntimeFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
 import freemarker.template.TemplateException;
 import org.jetbrains.annotations.NotNull;
@@ -28,29 +30,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, ExtensionFactory<ExtensionHandler> {
+public abstract class AbstractTemplateEngine implements RuntimeFactory, ExtensionFactory<ExtensionHandler> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractTemplateEngine.class);
 
     private ConfigBuilder configBuilder;
 
-    private PathFactory<PathEnum> pathFactory;
+    private RuntimeFactory runtimeFactory;
 
     private ExtensionFactory<ExtensionHandler> extensionFactory;
 
     public AbstractTemplateEngine init(ConfigBuilder configBuilder) {
         this.configBuilder = configBuilder;
-        this.pathFactory = preparePathFactory();
+        this.runtimeFactory = preparePathFactory();
         this.extensionFactory = prepareExtensionFactory();
         return doInit(configBuilder);
     }
 
-    private PathFactory<PathEnum> preparePathFactory() {
-        return new PathFactoryImpl(this.configBuilder.getGlobalConfig());
+    private RuntimeFactory preparePathFactory() {
+        return new RuntimeFactoryImpl(this.configBuilder.getGlobalConfig());
     }
 
     private ExtensionFactory<ExtensionHandler> prepareExtensionFactory() {
-        return new ExtensionFactoryImpl(this.pathFactory);
+        return new ExtensionFactoryImpl(this.runtimeFactory);
     }
 
     public void generate() {
@@ -152,18 +154,37 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
                         .parent(getPackage(PathEnum.pkg)) // 设置父包名
                         .pathInfo(Collections.singletonMap(OutputFile.xml, getAbsolutePath(PathEnum.resource) + Constant.XML_PATH)) // 设置mapperXml生成路径
                         .build())
+                .injection(new InjectionConfig.Builder()
+                        .customFile(new CustomFile.Builder() // 自定义DTO
+                                .fileName("DTO.java")
+                                .filePath(getAbsolutePath(PathEnum.pkg))
+                                .packageName(getPackage(PathEnum.pkg) + ".dto")
+                                .enableFileOverride()
+                                .templatePath("templates/dto.java.ftl")
+                                .build())
+                        .build())
                 .strategy(config.getStrategyConfig())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
     }
 
     private void generateExtension(ConfigBuilder config) {
-        List<ExtensionHandler> extensions = extensionFactory.getExtensions();
+        // 提供一个扩展接口，用于增加用户自定义数据
+        ((RuntimeFactoryImpl)this.runtimeFactory).putAllData(prepareDataMap());
+        List<ExtensionHandler> extensions = this.extensionFactory.getExtensions();
         extensions.forEach(e -> {
             logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + e.getName());
             this.outputFile(createFile(e.getOutputFilePath(), e.getOutputFileName(), Constant.JAVA_SUFFIX),
                     Constant.APPLICATION_TEMPLATE,
                     builder -> builder.putAll(e.getObjectMap()).getAll());
         });
+    }
+
+    /**
+     * 扩展接口，用户自定义数据
+     * @return
+     */
+    protected Map<String, Object> prepareDataMap() {
+        return new HashMap<>();
     }
 
     /**
@@ -209,17 +230,22 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
 
     @Override
     public String getAbsolutePath(PathEnum pathEnum) {
-        return this.pathFactory.getAbsolutePath(pathEnum);
+        return this.runtimeFactory.getAbsolutePath(pathEnum);
     }
 
     @Override
     public String getRelativePath(PathEnum pathEnum) {
-        return this.pathFactory.getRelativePath(pathEnum);
+        return this.runtimeFactory.getRelativePath(pathEnum);
     }
 
     @Override
     public String getPackage(PathEnum pathEnum) {
-        return this.pathFactory.getPackage(pathEnum);
+        return this.runtimeFactory.getPackage(pathEnum);
+    }
+
+    @Override
+    public Object getData(String key) {
+        return this.runtimeFactory.getData(key);
     }
 
     @Override

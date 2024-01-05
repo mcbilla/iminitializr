@@ -31,4 +31,9 @@ public class DtoHandlerimpl implements ExtensionHandler {
     public String getOutputFilePath() {
         return "3333";
     }
+
+    @Override
+    public boolean enable() {
+        return false;
+    }
 }

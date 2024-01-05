@@ -3,18 +3,20 @@ package com.mcb.iminitializr.support.impl;
 import com.mcb.iminitializr.config.GlobalConfig;
 import com.mcb.iminitializr.constant.Constant;
 import com.mcb.iminitializr.constant.PathEnum;
-import com.mcb.iminitializr.support.PathFactory;
+import com.mcb.iminitializr.support.RuntimeFactory;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PathFactoryImpl implements PathFactory<PathEnum> {
+public class RuntimeFactoryImpl implements RuntimeFactory {
     private Map<PathEnum, String> absolutePathMap = new HashMap<>();
 
     private Map<PathEnum, String> relativePathMap = new HashMap<>();
 
     private Map<PathEnum, String> packageMap = new HashMap<>();
+
+    private Map<String, Object> dataMap = new HashMap<>();
 
     private String rootPath;
 
@@ -22,7 +24,7 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
 
     private String packagePath;
 
-    public PathFactoryImpl(GlobalConfig globalConfig) {
+    public RuntimeFactoryImpl(GlobalConfig globalConfig) {
         String groupId = globalConfig.getGroupId();
         String artifactId = globalConfig.getArtifactId();
         // 获取根路径
@@ -31,7 +33,9 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
         this.packageName = groupId + Constant.DOT + artifactId.replace(Constant.DASH, Constant.DOT);
         // 获取包路径，com/mcb
         this.packagePath = this.packageName.replace(Constant.DOT, File.separator);
-
+        if (dataMap != null) {
+            this.dataMap.putAll(dataMap);
+        }
         handleAbsolutePathMap();
         handleRelativePathMap();
         handlePackageMap();
@@ -88,5 +92,14 @@ public class PathFactoryImpl implements PathFactory<PathEnum> {
     @Override
     public String getPackage(PathEnum pathEnum) {
         return packageMap.get(pathEnum);
+    }
+
+    @Override
+    public Object getData(String key) {
+        return dataMap.get(key);
+    }
+
+    public void putAllData(Map<String, Object> dataMap) {
+        this.dataMap.putAll(dataMap);
     }
 }
