@@ -10,14 +10,10 @@ public abstract class Constant {
 
     public static final String JAVA_ROOT_PATH = "/src/main/java";
     public static final String RESOURCE_ROOT_PATH = "/src/main/resources";
-
     public static final String TEST_JAVA_ROOT_PATH = "/src/test/java";
     public static final String TEST_RESOURCE_ROOT_PATH = "/src/test/resources";
-
     public static final String TEST_PATH = "/test";
-
     public static final String XML_PATH = "/mapper";
-
     public static final String TEMPLATE_PATH = "/templates";
 
     /*----------------------------------Template--------------------------------*/

@@ -13,6 +13,7 @@ public enum PathEnum {
     // src/main/resource
     resource,
     // src/main/java/com/mcb
+    // com/mcb
     // com.mcb
     pkg,
     // src/test/java
@@ -20,6 +21,7 @@ public enum PathEnum {
     // src/test/resource
     test_resource,
     // src/test/java/com/mcb
+    // com/mcb
     // com.mcb
     test_pkg,
 }

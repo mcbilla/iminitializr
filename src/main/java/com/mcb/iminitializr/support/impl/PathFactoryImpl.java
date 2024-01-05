@@ -10,53 +10,79 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PathFactoryImpl implements PathFactory<PathEnum> {
-    private Map<PathEnum, String> pathMap = new HashMap<>();
+    private Map<PathEnum, String> absolutePathMap = new HashMap<>();
+
+    private Map<PathEnum, String> relativePathMap = new HashMap<>();
 
     private Map<PathEnum, String> packageMap = new HashMap<>();
 
-    public PathFactoryImpl(GlobalConfig globalConfig) {
-        initPath(globalConfig);
-    }
+    private String rootPath;
 
-    public void initPath(GlobalConfig globalConfig) {
+    private String packageName;
+
+    private String packagePath;
+
+    public PathFactoryImpl(GlobalConfig globalConfig) {
         String groupId = globalConfig.getGroupId();
         String artifactId = globalConfig.getArtifactId();
         // 获取根路径
-        String rootPath = globalConfig.getOutputDir() + File.separator + artifactId;
+        this.rootPath = globalConfig.getOutputDir() + File.separator + artifactId;
         // 获取包值，com.mcb
-        String packageVal = groupId + Constant.DOT + artifactId.replace(Constant.DASH, Constant.DOT);
-        // 获取包路径，/com/mcb
-        String packagePath = File.separator + packageVal.replace(Constant.DOT, File.separator);
+        this.packageName = groupId + Constant.DOT + artifactId.replace(Constant.DASH, Constant.DOT);
+        // 获取包路径，com/mcb
+        this.packagePath = this.packageName.replace(Constant.DOT, File.separator);
 
-        handlePathMap(rootPath, packagePath);
+        handleAbsolutePathMap();
+        handleRelativePathMap();
         handlePackageMap();
     }
 
-    private void handlePathMap(String rootPath, String packagePath) {
-        this.pathMap.put(PathEnum.root, rootPath);
-        this.pathMap.put(PathEnum.java, getPath(PathEnum.root) + Constant.JAVA_ROOT_PATH);
-        this.pathMap.put(PathEnum.resource, getPath(PathEnum.root) + Constant.RESOURCE_ROOT_PATH);
-        this.pathMap.put(PathEnum.pkg, getPath(PathEnum.java) + packagePath);
-        this.pathMap.put(PathEnum.test_java, getPath(PathEnum.root) + Constant.TEST_JAVA_ROOT_PATH);
-        this.pathMap.put(PathEnum.test_resource, getPath(PathEnum.root) + Constant.TEST_RESOURCE_ROOT_PATH);
-        this.pathMap.put(PathEnum.test_pkg, getPath(PathEnum.test_java) + packagePath + Constant.TEST_PATH);
+    private void handleAbsolutePathMap() {
+        this.absolutePathMap.put(PathEnum.root, this.rootPath);
+        this.absolutePathMap.put(PathEnum.java, getAbsolutePath(PathEnum.root) + Constant.JAVA_ROOT_PATH);
+        this.absolutePathMap.put(PathEnum.resource, getAbsolutePath(PathEnum.root) + Constant.RESOURCE_ROOT_PATH);
+        this.absolutePathMap.put(PathEnum.pkg, getAbsolutePath(PathEnum.java) + File.separator + this.packagePath);
+        this.absolutePathMap.put(PathEnum.test_java, getAbsolutePath(PathEnum.root) + Constant.TEST_JAVA_ROOT_PATH);
+        this.absolutePathMap.put(PathEnum.test_resource, getAbsolutePath(PathEnum.root) + Constant.TEST_RESOURCE_ROOT_PATH);
+        this.absolutePathMap.put(PathEnum.test_pkg, getAbsolutePath(PathEnum.test_java) + File.separator + this.packagePath + Constant.TEST_PATH);
+    }
+
+    private void handleRelativePathMap() {
+        this.relativePathMap.put(PathEnum.pkg, absolutePathToRelative(this.absolutePathMap.get(PathEnum.pkg)));
+        this.relativePathMap.put(PathEnum.test_pkg, absolutePathToRelative(this.absolutePathMap.get(PathEnum.test_pkg)));
     }
 
     private void handlePackageMap() {
-        this.packageMap.put(PathEnum.pkg, pathToPackage(this.pathMap.get(PathEnum.pkg)));
-        this.packageMap.put(PathEnum.test_pkg, pathToPackage(this.pathMap.get(PathEnum.test_pkg)));
+        this.packageMap.put(PathEnum.pkg, relativePathToPackage(this.relativePathMap.get(PathEnum.pkg)));
+        this.packageMap.put(PathEnum.test_pkg, relativePathToPackage(this.relativePathMap.get(PathEnum.test_pkg)));
     }
 
-    private String pathToPackage(String s) {
-        // /root/src/main/java/com/mcb/xxx -> com/mcb/xxx
-        String pkg = s.substring(getPath(PathEnum.java).length() + 1);
-        // com/mcb/xxx -> com.mcb.xxx
-        return pkg.replaceAll(File.separator, Constant.DOT);
+    /**
+     * /root/src/main/java/com/mcb/xxx -> com/mcb/xxx
+     * @param s
+     * @return
+     */
+    private String absolutePathToRelative(String s) {
+        return s.substring(getAbsolutePath(PathEnum.java).length() + 1);
+    }
+
+    /**
+     * com/mcb/xxx -> com.mcb.xxx
+     * @param s
+     * @return
+     */
+    private String relativePathToPackage(String s) {
+        return s.replaceAll(File.separator, Constant.DOT);
     }
 
     @Override
-    public String getPath(PathEnum path) {
-        return pathMap.get(path);
+    public String getAbsolutePath(PathEnum pathEnum) {
+        return absolutePathMap.get(pathEnum);
+    }
+
+    @Override
+    public String getRelativePath(PathEnum pathEnum) {
+        return relativePathMap.get(pathEnum);
     }
 
     @Override

@@ -77,13 +77,13 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
     private void generateProject(ConfigBuilder config) {
         GlobalConfig globalConfig = config.getGlobalConfig();
         // 根目录路径
-        String rootPath = getPath(PathEnum.root);
+        String rootPath = getAbsolutePath(PathEnum.root);
         // java包路径
-        String packagePath = getPath(PathEnum.pkg);
+        String packagePath = getAbsolutePath(PathEnum.pkg);
         // java资源路径
-        String resourcePath = getPath(PathEnum.resource);
+        String resourcePath = getAbsolutePath(PathEnum.resource);
         // 测试包路径
-        String testPackagePath = getPath(PathEnum.test_pkg);
+        String testPackagePath = getAbsolutePath(PathEnum.test_pkg);
 
         // 1、创建application
         // 获取application名，大写开头驼峰式
@@ -149,11 +149,11 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
                         .author(config.getGlobalConfig().getAuthor()) // 设置作者
                         .enableSwagger() // 开启 swagger 模式
-                        .outputDir(getPath(PathEnum.pkg)) // 指定输出目录
+                        .outputDir(getAbsolutePath(PathEnum.pkg)) // 指定输出目录
                         .build())
                 .packageInfo(new PackageConfig.Builder()
                         .parent(getPackage(PathEnum.pkg)) // 设置父包名
-                        .pathInfo(Collections.singletonMap(OutputFile.xml, getPath(PathEnum.resource) + Constant.XML_PATH)) // 设置mapperXml生成路径
+                        .pathInfo(Collections.singletonMap(OutputFile.xml, getAbsolutePath(PathEnum.resource) + Constant.XML_PATH)) // 设置mapperXml生成路径
                         .build())
                 .strategy(config.getStrategyConfig())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
@@ -203,8 +203,13 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
     }
 
     @Override
-    public String getPath(PathEnum pathEnum) {
-        return this.pathFactory.getPath(pathEnum);
+    public String getAbsolutePath(PathEnum pathEnum) {
+        return this.pathFactory.getAbsolutePath(pathEnum);
+    }
+
+    @Override
+    public String getRelativePath(PathEnum pathEnum) {
+        return this.pathFactory.getRelativePath(pathEnum);
     }
 
     @Override
