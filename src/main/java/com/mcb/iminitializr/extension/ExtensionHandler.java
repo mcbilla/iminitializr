@@ -1,8 +1,8 @@
 package com.mcb.iminitializr.extension;
 
-import com.mcb.iminitializr.constant.PathEnum;
-import com.mcb.iminitializr.support.PathFactory;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -20,11 +20,18 @@ public interface ExtensionHandler {
         return true;
     }
 
+    default String getName() {
+        return getOutputFilePath() + File.separator + getOutputFileName();
+    }
+
+    @NotNull
     String getTemplateName();
 
     Map<String, Object> getObjectMap();
 
+    @NotNull
     String getOutputFileName();
 
+    @NotNull
     String getOutputFilePath();
 }

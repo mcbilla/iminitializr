@@ -4,11 +4,13 @@ import com.mcb.iminitializr.config.ConfigBuilder;
 import com.mcb.iminitializr.constant.Constant;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine{
     }
 
     @Override
-    protected void doWrite(Map<String, Object> objectMap, String templatePath, File file) throws Exception {
+    protected void doWrite(Map<String, Object> objectMap, String templatePath, File file) throws IOException, TemplateException {
         Template template = configuration.getTemplate(templatePath);
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             template.process(objectMap, new OutputStreamWriter(fileOutputStream, Constant.UTF8));

@@ -52,7 +52,7 @@ public class ExtensionFactoryImpl implements ExtensionFactory<ExtensionHandler> 
     private Map<String, ExtensionHandler> initExtensionHandlerMap() {
         return this.extensionHandlerList.stream()
                 .collect(Collectors.toMap(
-                        item -> item.getOutputFilePath() + item.getOutputFileName(),
+                        ExtensionHandler::getName,
                         Function.identity(),
                         (o1, o2) -> {
                             throw new IllegalArgumentException("扩展插件名重复: " + o1);

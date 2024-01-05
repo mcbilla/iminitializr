@@ -11,16 +11,17 @@ import com.mcb.iminitializr.constant.PathEnum;
 import com.mcb.iminitializr.extension.ExtensionHandler;
 import com.mcb.iminitializr.support.ExtensionFactory;
 import com.mcb.iminitializr.support.PathFactory;
-import com.mcb.iminitializr.support.PathFactoryAware;
 import com.mcb.iminitializr.support.impl.ExtensionFactoryImpl;
 import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
+import freemarker.template.TemplateException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -158,8 +159,10 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
     private void generateExtension(ConfigBuilder config) {
         List<ExtensionHandler> extensions = extensionFactory.getExtensions();
         extensions.forEach(e -> {
-            String extensionName = e.getOutputFilePath() + e.getOutputFileName();
-            logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + extensionName);
+            logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + e.getName());
+            this.outputFile(createFile(e.getOutputFilePath(), e.getOutputFileName(), Constant.JAVA_SUFFIX),
+                    Constant.APPLICATION_TEMPLATE,
+                    builder -> builder.putAll(e.getObjectMap()).getAll());
         });
     }
 
@@ -189,14 +192,16 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
      */
     protected void outputFile(File file, String templateName, Function<ObjectMapBuilder, Map<String, Object>> objectMapBuilder) {
         try {
-            // 全局判断【默认】
-            boolean exist = file.exists();
-            if (!exist) {
+            if (!file.exists()) {
                 File parentFile = file.getParentFile();
                 FileUtils.forceMkdir(parentFile);
             }
             Map<String, Object> objectMap = objectMapBuilder != null ? objectMapBuilder.apply(new ObjectMapBuilder()) : null;
             doWrite(objectMap, doGetTemplatePath(templateName), file);
+        } catch (IOException e) {
+            throw new RuntimeException("文件写入异常", e);
+        } catch (TemplateException e) {
+            throw new RuntimeException("模板渲染异常", e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -265,6 +270,11 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
 
         public ObjectMapBuilder put(String key, Object obj) {
             objectMap.putIfAbsent(key, obj);
+            return this;
+        }
+
+        public ObjectMapBuilder putAll(Map<String, Object> map) {
+            objectMap.putAll(map);
             return this;
         }
 
