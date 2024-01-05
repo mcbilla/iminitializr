@@ -15,6 +15,9 @@ import com.mcb.iminitializr.support.PathFactoryAware;
 import com.mcb.iminitializr.support.impl.ExtensionFactoryImpl;
 import com.mcb.iminitializr.support.impl.PathFactoryImpl;
 import com.mcb.iminitializr.utils.FileUtils;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -25,6 +28,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, ExtensionFactory<ExtensionHandler> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractTemplateEngine.class);
+
     private ConfigBuilder configBuilder;
 
     private PathFactory<PathEnum> pathFactory;
@@ -43,20 +49,7 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
     }
 
     private ExtensionFactory<ExtensionHandler> prepareExtensionFactory() {
-        ExtensionFactory<ExtensionHandler> extensionFactory = new ExtensionFactoryImpl();
-        invokeAwareInterfaces(extensionFactory);
-        return extensionFactory;
-    }
-
-    private void invokeAwareInterfaces(ExtensionFactory<ExtensionHandler> extensionFactory) {
-        List<ExtensionHandler> extensions = extensionFactory.getExtensions();
-        if (extensions != null) {
-            extensions.forEach(e -> {
-                if (PathFactoryAware.class.isAssignableFrom(e.getClass())) {
-                    ((PathFactoryAware) e).setPathFactory(this.pathFactory);
-                }
-            });
-        }
+        return new ExtensionFactoryImpl(this.pathFactory);
     }
 
     public void generate() {
@@ -141,11 +134,14 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
      */
     private void generateMVC(ConfigBuilder config) {
         DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
-        Assert.noNullElements(new String[]{dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()}, "数据库连接信息不能为空");
-
-        new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(
-                dataSourceConfig.getUrl(), dataSourceConfig.getUsername(), dataSourceConfig.getPassword()
-        ).build())
+        @NotNull
+        String url = dataSourceConfig.getUrl();
+        @NotNull
+        String username = dataSourceConfig.getUsername();
+        @NotNull
+        String password = dataSourceConfig.getPassword();
+        Assert.noNullElements(new String[]{url, username, password}, "数据库连接信息不能为空");
+        new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(url, username, password).build())
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
                         .author(config.getGlobalConfig().getAuthor()) // 设置作者
                         .enableSwagger() // 开启 swagger 模式
@@ -160,7 +156,11 @@ public abstract class AbstractTemplateEngine implements PathFactory<PathEnum>, E
     }
 
     private void generateExtension(ConfigBuilder config) {
-
+        List<ExtensionHandler> extensions = extensionFactory.getExtensions();
+        extensions.forEach(e -> {
+            String extensionName = e.getOutputFilePath() + e.getOutputFileName();
+            logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + extensionName);
+        });
     }
 
     /**

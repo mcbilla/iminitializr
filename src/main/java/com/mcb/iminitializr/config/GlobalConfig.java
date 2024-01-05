@@ -1,5 +1,7 @@
 package com.mcb.iminitializr.config;
 
+import org.jetbrains.annotations.NotNull;
+
 public class GlobalConfig {
     /**
      * 生成文件的输出目录【 windows:D://  linux or mac:/tmp 】

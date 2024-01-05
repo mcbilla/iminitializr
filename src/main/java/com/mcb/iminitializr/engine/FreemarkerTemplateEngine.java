@@ -31,7 +31,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine{
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             template.process(objectMap, new OutputStreamWriter(fileOutputStream, Constant.UTF8));
         }
-        logger.debug("模板:" + templatePath + ";  文件:" + file);
+        logger.debug("模板:" + templatePath + "; 文件:" + file);
     }
 
     @Override

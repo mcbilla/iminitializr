@@ -16,6 +16,10 @@ import java.util.Map;
  */
 public interface ExtensionHandler {
 
+    default boolean enable() {
+        return true;
+    }
+
     String getTemplateName();
 
     Map<String, Object> getObjectMap();
