@@ -148,7 +148,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
                         .author(config.getGlobalConfig().getAuthor()) // 设置作者
                         .enableSwagger() // 开启 swagger 模式
-                        .outputDir(getAbsolutePath(PathEnum.pkg)) // 指定输出目录
+                        .outputDir(getAbsolutePath(PathEnum.root) + Constant.JAVA_ROOT_PATH) // 指定输出目录
                         .build())
                 .packageInfo(new PackageConfig.Builder()
                         .parent(getPackage(PathEnum.pkg)) // 设置父包名
@@ -157,7 +157,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                 .injection(new InjectionConfig.Builder()
                         .customFile(new CustomFile.Builder() // 自定义DTO
                                 .fileName("DTO.java")
-                                .filePath(getAbsolutePath(PathEnum.pkg))
+                                .filePath(getAbsolutePath(PathEnum.root) + Constant.JAVA_ROOT_PATH)
                                 .packageName(getPackage(PathEnum.pkg) + ".dto")
                                 .enableFileOverride()
                                 .templatePath("templates/dto.java.ftl")
@@ -173,8 +173,8 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
         List<ExtensionHandler> extensions = this.extensionFactory.getExtensions();
         extensions.forEach(e -> {
             logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + e.getName());
-            this.outputFile(createFile(e.getOutputFilePath(), e.getOutputFileName(), Constant.JAVA_SUFFIX),
-                    Constant.APPLICATION_TEMPLATE,
+            this.outputFile(createFile(getAbsolutePath(PathEnum.root) + e.getOutputFilePath(), e.getOutputFileName(), Constant.JAVA_SUFFIX),
+                    e.getTemplateName(),
                     builder -> builder.putAll(e.getObjectMap()).getAll());
         });
     }

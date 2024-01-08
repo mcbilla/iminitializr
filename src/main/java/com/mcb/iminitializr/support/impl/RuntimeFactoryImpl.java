@@ -57,26 +57,27 @@ public class RuntimeFactoryImpl implements RuntimeFactory {
     }
 
     private void handlePackageMap() {
-        this.packageMap.put(PathEnum.pkg, relativePathToPackage(this.relativePathMap.get(PathEnum.pkg)));
-        this.packageMap.put(PathEnum.test_pkg, relativePathToPackage(this.relativePathMap.get(PathEnum.test_pkg)));
+        this.packageMap.put(PathEnum.pkg, absolutePathToPackage(this.absolutePathMap.get(PathEnum.pkg)));
+        this.packageMap.put(PathEnum.test_pkg, absolutePathToPackage(this.absolutePathMap.get(PathEnum.test_pkg)));
     }
 
     /**
-     * /root/src/main/java/com/mcb/xxx -> com/mcb/xxx
+     * /root/src/main/java/com/mcb/xxx -> /src/main/java/com/mcb/xxx
      * @param s
      * @return
      */
     private String absolutePathToRelative(String s) {
-        return s.substring(getAbsolutePath(PathEnum.java).length() + 1);
+        return s.substring(getAbsolutePath(PathEnum.root).length());
     }
 
     /**
-     * com/mcb/xxx -> com.mcb.xxx
+     * /root/src/main/java/com/mcb/xxx -> com.mcb.xxx
      * @param s
      * @return
      */
-    private String relativePathToPackage(String s) {
-        return s.replaceAll(File.separator, Constant.DOT);
+    private String absolutePathToPackage(String s) {
+        return s.substring((getAbsolutePath(PathEnum.root) + Constant.JAVA_ROOT_PATH).length() + 1)
+                .replaceAll(File.separator, Constant.DOT);
     }
 
     @Override

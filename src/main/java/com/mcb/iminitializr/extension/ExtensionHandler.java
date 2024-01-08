@@ -3,6 +3,7 @@ package com.mcb.iminitializr.extension;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +28,10 @@ public interface ExtensionHandler {
     @NotNull
     String getTemplateName();
 
-    Map<String, Object> getObjectMap();
+    @NotNull
+    default Map<String, Object> getObjectMap() {
+        return new HashMap<>();
+    }
 
     @NotNull
     String getOutputFileName();
