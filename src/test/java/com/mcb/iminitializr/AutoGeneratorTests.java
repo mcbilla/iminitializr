@@ -9,7 +9,7 @@ class AutoGeneratorTests {
         AutoGenerator.create()
                 .globalConfig(builder -> {
                     builder.groupId("com.mcb")
-                            .artifactId("test")
+                            .artifactId("my-test")
                             .outputDir("/Users/mochuangbiao/Files")
                             .author("mcb");
                 })

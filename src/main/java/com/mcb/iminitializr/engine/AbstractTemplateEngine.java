@@ -144,6 +144,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
         @NotNull
         String password = dataSourceConfig.getPassword();
         Assert.noNullElements(new String[]{url, username, password}, "数据库连接信息不能为空");
+        // 1、创建mvc结构
         new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(url, username, password).build())
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
                         .author(config.getGlobalConfig().getAuthor()) // 设置作者
@@ -163,8 +164,30 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                                 .templatePath("templates/dto.java.ftl")
                                 .build())
                         .build())
-                .strategy(config.getStrategyConfig())
+                .strategy(config.getStrategyConfig()
+                        .entityBuilder().enableFileOverride() // 实体文件覆盖
+                        .mapperBuilder().enableFileOverride() // Mapper文件覆盖
+                        .serviceBuilder().enableFileOverride() // Service文件覆盖
+                        .controllerBuilder().enableFileOverride() // Controller文件覆盖
+                        .build())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
+
+        // 2、创建统一返回result
+        this.outputFile(createFile(getAbsolutePath(PathEnum.pkg) + File.separator + Constant.GLOBAL_PATH, Constant.RESULT_ENUM_NAME, Constant.JAVA_SUFFIX),
+                Constant.RESULT_ENUM_TEMPLATE,
+                builder -> builder
+                        .put("className", Constant.RESULT_ENUM_NAME)
+                        .put("packageName", getPackage(PathEnum.pkg) + Constant.DOT + "global")
+                        .getAll());
+
+        this.outputFile(createFile(getAbsolutePath(PathEnum.pkg) + File.separator + Constant.GLOBAL_PATH, Constant.RESULT_NAME, Constant.JAVA_SUFFIX),
+                Constant.RESULT_TEMPLATE,
+                builder -> builder
+                        .put("className", Constant.RESULT_NAME)
+                        .put("enumClassName", Constant.RESULT_ENUM_NAME)
+                        .put("packageName", getPackage(PathEnum.pkg) + Constant.DOT + "global")
+                        .getAll());
+
     }
 
     private void generateExtension(ConfigBuilder config) {

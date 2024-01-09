@@ -16,6 +16,8 @@ public abstract class Constant {
     public static final String XML_PATH = "/mapper";
     public static final String TEMPLATE_PATH = "/templates";
 
+    public static final String GLOBAL_PATH = "/global";
+
     /*----------------------------------Template--------------------------------*/
     public static final String FREEMARKER_SUFFIX = ".ftl";
     public static final String APPLICATION_TEMPLATE = "application.java";
@@ -24,11 +26,15 @@ public abstract class Constant {
     public static final String YML_TEMPLATE = "application.yml";
     public static final String POM_TEMPLATE = "pom.xml";
     public static final String GITIGNORE_TEMPLATE = ".gitignore";
+    public static final String RESULT_TEMPLATE = "result.java";
+    public static final String RESULT_ENUM_TEMPLATE = "resultenum.java";
 
     /*----------------------------------Java File--------------------------------*/
     public static final String JAVA_SUFFIX = ".java";
     public static final String APPLICATION_NAME = "Application";
     public static final String TEST_NAME = "ApplicationTests";
+    public static final String RESULT_NAME = "Result";
+    public static final String RESULT_ENUM_NAME = "ResultEnum";
 
     /*----------------------------------String--------------------------------*/
 

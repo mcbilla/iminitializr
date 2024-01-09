@@ -1,6 +1,7 @@
 package ${package.Controller};
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import ${package.Parent}.global.Result
 <#if restControllerStyle>
 import org.springframework.web.bind.annotation.RestController;
 <#else>
@@ -32,6 +33,9 @@ public class ${table.controllerName} extends ${superControllerClass} {
 <#else>
 public class ${table.controllerName} {
 </#if>
-
+    @RequestMapping(value = "/hello")
+    public Result<String> hello() {
+        return Result.success("Hello ${table.controllerName}");
+    }
 }
 </#if>

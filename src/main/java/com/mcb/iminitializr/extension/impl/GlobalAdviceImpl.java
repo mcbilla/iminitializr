@@ -9,8 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConstantImpl implements ExtensionHandler, RuntimeFactoryAware {
-
+public class GlobalAdviceImpl implements ExtensionHandler, RuntimeFactoryAware {
     private RuntimeFactory runtimeFactory;
 
     @Override
@@ -18,26 +17,27 @@ public class ConstantImpl implements ExtensionHandler, RuntimeFactoryAware {
         this.runtimeFactory = factory;
     }
 
+
     @Override
     public @NotNull String getTemplateName() {
-        return "constant.java";
+        return "global.advice.java";
     }
 
     @Override
     public @NotNull Map<String, Object> getObjectMap() {
         Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg) + ".constant");
+        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg) + ".global");
         objectMap.put("className", getOutputFileName());
         return objectMap;
     }
 
     @Override
     public @NotNull String getOutputFileName() {
-        return "ResultEnum";
+        return "GlobalResponseBodyAdvice";
     }
 
     @Override
     public @NotNull String getOutputFilePath() {
-        return this.runtimeFactory.getRelativePath(PathEnum.pkg) + "/constant";
+        return this.runtimeFactory.getRelativePath(PathEnum.pkg) + "/global";
     }
 }
