@@ -1,5 +1,13 @@
 package ${packageName};
 
+/**
+* <p>
+* 响应枚举值
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 public enum ${className} {
     SUCCESS(200, "成功"),
     VALIDATE_FAILED(401, "参数校验失败"),

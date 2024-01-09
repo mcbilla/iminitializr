@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,12 +58,25 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
 
     public void generate() {
         ConfigBuilder config = this.getConfigBuilder();
+        // 校验参数
+        verifyConfig(config);
         // 创建整体项目
         generateProject(config);
         // 创建基本MVC结构
         generateMVC(config);
         // 创建扩展
         generateExtension(config);
+    }
+
+    private void verifyConfig(ConfigBuilder config) {
+        DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
+        @NotNull
+        String url = dataSourceConfig.getUrl();
+        @NotNull
+        String username = dataSourceConfig.getUsername();
+        @NotNull
+        String password = dataSourceConfig.getPassword();
+        Assert.noNullElements(new String[]{url, username, password}, "数据库连接信息不能为空");
     }
 
     /**
@@ -87,30 +101,35 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
         this.outputFile(createFile(packagePath, applicationName, Constant.JAVA_SUFFIX),
                 Constant.APPLICATION_TEMPLATE,
                 builder -> builder
-                        .put("applicationName", applicationName)
+                        .put("className", applicationName)
                         .put("packageName", getPackage(PathEnum.pkg))
-                        .getAll());
+                        .build());
 
         // 2、创建package-info
         this.outputFile(createFile(packagePath, Constant.PACKAGE_INFO_TEMPLATE, null),
                 Constant.PACKAGE_INFO_TEMPLATE,
                 builder -> builder
                         .put("packageName", getPackage(PathEnum.pkg))
-                        .getAll());
+                        .build());
 
         // 3、创建test
         String testName = FileUtils.separatorToCamel(globalConfig.getArtifactId(), Constant.DASH, Constant.TEST_NAME);
         this.outputFile(createFile(testPackagePath, testName, Constant.JAVA_SUFFIX),
                 Constant.TEST_TEMPLATE,
                 builder -> builder
-                        .put("testName", testName)
+                        .put("className", testName)
                         .put("packageName", getPackage(PathEnum.test_pkg))
-                        .getAll());
+                        .build());
 
         // 4、创建yml
+        DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
         this.outputFile(createFile(resourcePath, Constant.YML_TEMPLATE, null),
                 Constant.YML_TEMPLATE,
-                null);
+                builder -> builder
+                        .put("url", dataSourceConfig.getUrl())
+                        .put("username", dataSourceConfig.getUsername())
+                        .put("password", dataSourceConfig.getPassword())
+                        .build());
 
         // 5、创建pom
         this.outputFile(createFile(rootPath, Constant.POM_TEMPLATE, null),
@@ -121,7 +140,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                         .put("version", globalConfig.getVersion())
                         .put("name", globalConfig.getName())
                         .put("description", globalConfig.getDescription())
-                        .getAll()
+                        .build()
         );
 
         // 6、创建.gitignore
@@ -137,13 +156,9 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
      */
     private void generateMVC(ConfigBuilder config) {
         DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
-        @NotNull
         String url = dataSourceConfig.getUrl();
-        @NotNull
         String username = dataSourceConfig.getUsername();
-        @NotNull
         String password = dataSourceConfig.getPassword();
-        Assert.noNullElements(new String[]{url, username, password}, "数据库连接信息不能为空");
         // 1、创建mvc结构
         new AutoGenerator(new com.baomidou.mybatisplus.generator.config.DataSourceConfig.Builder(url, username, password).build())
                 .global(new com.baomidou.mybatisplus.generator.config.GlobalConfig.Builder()
@@ -168,25 +183,31 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                         .entityBuilder().enableFileOverride() // 实体文件覆盖
                         .mapperBuilder().enableFileOverride() // Mapper文件覆盖
                         .serviceBuilder().enableFileOverride() // Service文件覆盖
-                        .controllerBuilder().enableFileOverride() // Controller文件覆盖
+                        .controllerBuilder().enableRestStyle().enableFileOverride() // Controller文件覆盖+开启RestController
                         .build())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
 
+        Map<String, Object> objectMap = new ObjectMapBuilder()
+                .put("author", config.getGlobalConfig().getAuthor())
+                .put("date", LocalDate.now())
+                .build();
         // 2、创建统一返回result
         this.outputFile(createFile(getAbsolutePath(PathEnum.pkg) + File.separator + Constant.GLOBAL_PATH, Constant.RESULT_ENUM_NAME, Constant.JAVA_SUFFIX),
                 Constant.RESULT_ENUM_TEMPLATE,
                 builder -> builder
+                        .putAll(objectMap)
                         .put("className", Constant.RESULT_ENUM_NAME)
                         .put("packageName", getPackage(PathEnum.pkg) + Constant.DOT + "global")
-                        .getAll());
+                        .build());
 
         this.outputFile(createFile(getAbsolutePath(PathEnum.pkg) + File.separator + Constant.GLOBAL_PATH, Constant.RESULT_NAME, Constant.JAVA_SUFFIX),
                 Constant.RESULT_TEMPLATE,
                 builder -> builder
+                        .putAll(objectMap)
                         .put("className", Constant.RESULT_NAME)
                         .put("enumClassName", Constant.RESULT_ENUM_NAME)
                         .put("packageName", getPackage(PathEnum.pkg) + Constant.DOT + "global")
-                        .getAll());
+                        .build());
 
     }
 
@@ -198,7 +219,11 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
             logger.debug("加载插件，实现类:" + e.getClass().getSimpleName() + "; 插件名:" + e.getName());
             this.outputFile(createFile(getAbsolutePath(PathEnum.root) + e.getOutputFilePath(), e.getOutputFileName(), Constant.JAVA_SUFFIX),
                     e.getTemplateName(),
-                    builder -> builder.putAll(e.getObjectMap()).getAll());
+                    builder -> builder
+                            .put("author", config.getGlobalConfig().getAuthor())
+                            .put("date", LocalDate.now())
+                            .putAll(e.getObjectMap())
+                            .build());
         });
     }
 
@@ -327,7 +352,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
             return this;
         }
 
-        public Map<String, Object> getAll() {
+        public Map<String, Object> build() {
             return this.objectMap;
         }
     }

@@ -1,5 +1,13 @@
 package ${packageName};
 
+/**
+* <p>
+* 全局统一业务异常
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 public class ${className} extends RuntimeException {
     public BusnessException() {
         super();

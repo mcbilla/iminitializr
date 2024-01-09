@@ -18,10 +18,15 @@ import java.util.Set;
 import static ${packageName}.global.ResultEnum.*;
 
 /**
- * 统一异常处理
- */
-@RestControllerAdvice
+* <p>
+* 全局统一异常处理
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 @Slf4j
+@RestControllerAdvice
 public class ${className} {
 
     /**

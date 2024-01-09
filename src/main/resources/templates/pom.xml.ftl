@@ -22,7 +22,8 @@
         <mysql.version >8.0.13</mysql.version>
         <mybatis.plus.version>3.5.3.1</mybatis.plus.version>
         <lombok.version>1.18.26</lombok.version>
-        <swagger.version>2.9.2</swagger.version>
+        <swagger.version>3.0.0</swagger.version>
+        <hibernate.validator.version>6.2.5.Final</hibernate.validator.version>
     </properties>
 
     <dependencies>
@@ -71,14 +72,15 @@
         <!--swagger-->
         <dependency>
             <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
+            <artifactId>springfox-boot-starter</artifactId>
             <version>${r'${swagger.version}'}</version>
         </dependency>
 
+        <!--hibernate-validator-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${r'${swagger.version}'}</version>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${r'${hibernate.validator.version}'}</version>
         </dependency>
     </dependencies>
 

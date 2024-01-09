@@ -25,10 +25,10 @@ public class WebConfigImpl implements ExtensionHandler, RuntimeFactoryAware {
     @Override
     public @NotNull Map<String, Object> getObjectMap() {
         Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg) + ".config");
+        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg));
         objectMap.put("className", getOutputFileName());
-        objectMap.put("interceptorName", runtimeFactory.getPackage(PathEnum.pkg) + ".interceptor." + new InterceptorImpl().getOutputFileName());
-        objectMap.put("filterName", runtimeFactory.getPackage(PathEnum.pkg) + ".filter." + new FilterImpl().getOutputFileName());
+        objectMap.put("interceptorName", new InterceptorImpl().getOutputFileName());
+        objectMap.put("filterName", new FilterImpl().getOutputFileName());
 
         return objectMap;
     }

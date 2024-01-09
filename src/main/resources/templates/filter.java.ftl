@@ -1,4 +1,4 @@
-package ${packageName}
+package ${packageName};
 
 import org.springframework.util.StreamUtils;
 
@@ -7,6 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 
+/**
+* <p>
+* 请求过滤器，作用是把ServletRequest包装成RequestWrapper
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 public class ${className} implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

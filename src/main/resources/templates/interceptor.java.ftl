@@ -13,6 +13,14 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+* <p>
+* 请求拦截器，作用是打印请求参数、计算方法耗时等
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 public class ${className} implements HandlerInterceptor {
     private final Logger log = LoggerFactory.getLogger(getClass());
 

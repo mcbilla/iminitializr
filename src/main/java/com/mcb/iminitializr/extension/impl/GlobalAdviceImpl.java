@@ -26,7 +26,7 @@ public class GlobalAdviceImpl implements ExtensionHandler, RuntimeFactoryAware {
     @Override
     public @NotNull Map<String, Object> getObjectMap() {
         Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg) + ".global");
+        objectMap.put("packageName", runtimeFactory.getPackage(PathEnum.pkg));
         objectMap.put("className", getOutputFileName());
         return objectMap;
     }

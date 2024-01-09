@@ -1,10 +1,17 @@
-package ${packageName}
+package ${packageName};
 
-import ${packageName}.${enumClassName};
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+* <p>
+* 返回结果包装
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

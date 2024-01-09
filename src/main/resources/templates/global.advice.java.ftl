@@ -1,4 +1,4 @@
-package ${packageName};
+package ${packageName}.global;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,9 +12,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
- * 全局返回数据统一处理
- */
-@RestControllerAdvice
+* <p>
+* 全局统一返回数据包装
+* </p>
+*
+* @author ${author}
+* @since ${date}
+*/
+@RestControllerAdvice(basePackages = "${packageName}.controller")
 public class ${className} implements ResponseBodyAdvice<Object> {
 
     @Autowired
@@ -29,7 +34,7 @@ public class ${className} implements ResponseBodyAdvice<Object> {
     }
 
     /**
-     * 所有数据统一包装成 Result 返回
+     * 所有数据统一包装成Result返回
      */
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {

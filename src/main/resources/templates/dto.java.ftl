@@ -1,7 +1,9 @@
 package ${package.Parent}.dto;
 
 <#list table.importPackages as pkg>
+<#if pkg != 'com.baomidou.mybatisplus.annotation.IdType' && pkg != 'com.baomidou.mybatisplus.annotation.TableId'>
 import ${pkg};
+</#if>
 </#list>
 <#if springdoc>
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +21,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * ${table.comment!}
+ * ${table.comment!}DTO
  * </p>
  *
  * @author ${author}
@@ -35,7 +37,7 @@ import lombok.experimental.Accessors;
 <#if springdoc>
 @Schema(name = "${entity}", description = "${table.comment!}")
 <#elseif swagger>
-@ApiModel(value = "${entity}对象", description = "${table.comment!}")
+@ApiModel(value = "${entity}DTO", description = "${table.comment!}")
 </#if>
 <#if superEntityClass??>
 public class ${entity} extends ${superEntityClass}<#if activeRecord><${entity}></#if> {
