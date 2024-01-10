@@ -179,12 +179,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                                 .templatePath("templates/dto.java.ftl")
                                 .build())
                         .build())
-                .strategy(config.getStrategyConfig()
-                        .entityBuilder().enableFileOverride() // 实体文件覆盖
-                        .mapperBuilder().enableFileOverride() // Mapper文件覆盖
-                        .serviceBuilder().enableFileOverride() // Service文件覆盖
-                        .controllerBuilder().enableRestStyle().enableFileOverride() // Controller文件覆盖+开启RestController
-                        .build())
+                .strategy(config.getStrategyConfig())
                 .execute(new com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine());
 
         Map<String, Object> objectMap = new ObjectMapBuilder()

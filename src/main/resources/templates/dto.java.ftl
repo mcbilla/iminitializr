@@ -1,7 +1,9 @@
 package ${package.Parent}.dto;
 
 <#list table.importPackages as pkg>
-<#if pkg != 'com.baomidou.mybatisplus.annotation.IdType' && pkg != 'com.baomidou.mybatisplus.annotation.TableId'>
+<#if pkg != 'com.baomidou.mybatisplus.annotation.IdType'
+&& pkg != 'com.baomidou.mybatisplus.annotation.TableId'
+&& pkg != 'com.baomidou.mybatisplus.annotation.TableName'>
 import ${pkg};
 </#if>
 </#list>

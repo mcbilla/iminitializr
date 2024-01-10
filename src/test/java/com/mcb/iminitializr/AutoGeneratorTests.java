@@ -19,11 +19,12 @@ class AutoGeneratorTests {
                             .password("root");
                 })
                 .strategyConfigBuilder(builder -> {
-                    builder
-                            // 指定包含的表名，多个表之间逗号隔开，不调用该方法默认为所有表生成代码
-                            .addInclude("t_user,t_manager")
-                            // 过滤表前缀，即t_user变成user
-                            .addTablePrefix("t_");
+                    builder.addInclude("t_user,t_manager") // 指定包含的表名，多个表之间逗号隔开，不调用该方法默认为所有表生成代码
+                            .addTablePrefix("t_") // 过滤表前缀，即t_user变成user
+                            .entityBuilder().enableFileOverride() // 实体文件覆盖
+                            .mapperBuilder().enableFileOverride() // Mapper文件覆盖
+                            .serviceBuilder().enableFileOverride() // Service文件覆盖
+                            .controllerBuilder().enableFileOverride().enableRestStyle(); // Controller文件覆盖+开启RestController
                 })
                 .execute();
     }

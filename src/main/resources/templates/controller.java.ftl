@@ -3,6 +3,7 @@ package ${package.Controller};
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import ${package.Service}.${table.serviceName};
 import ${package.Parent}.global.Result;
@@ -38,11 +39,10 @@ public class ${table.controllerName} extends ${superControllerClass} {
 @Api(value = "${table.controllerName}", tags = "${table.controllerName}接口")
 public class ${table.controllerName} {
 </#if>
-
     @Autowired
     private ${table.serviceName} service;
 
-    @RequestMapping(value = "/hello")
+    @GetMapping(value = "/hello")
     @ApiOperation("hello")
     public Result<String> hello() {
         return Result.success("count: " + service.count());
