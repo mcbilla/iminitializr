@@ -42,7 +42,7 @@ Spring Initializr 是所有 java 开发入门必备的脚手架。可以分为 s
 
 Aliyun Java Initializr 和 Spring Initializr 是同类的 Web 服务，是代码框架生成器，一键生成你的代码框架，有完善的工具链，免费的 IDEA 插件，方便直接在 IDE 中生成，同时也非常适合国内用户的网络环境。
 
-> 链接：[https://start.aliyun.com](https://start.aliyun.com/)
+> 链接：[https://start.aliyun.com/](https://start.aliyun.com/)
 
 ### 2、基于数据库表的脚手架
 
@@ -201,7 +201,7 @@ class AutoGeneratorTests {
                                 └── MyTestApplicationTests.java
 ```
 
-使用 IDE 打开，项目初始化完成后，执行 `MyTestApplication`，访问 http://localhost:8081/user/hello，可以看到下面响应
+使用 IDE 打开，项目初始化完成后，执行 `MyTestApplication`，访问 http://localhost:8081/user/hello ，可以看到下面响应
 
 ```
 {
