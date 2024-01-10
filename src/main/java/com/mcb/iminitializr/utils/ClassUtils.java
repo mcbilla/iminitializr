@@ -40,6 +40,7 @@ public class ClassUtils {
                         rs.add(classObject);
                     }
                 }
+                classNames.clear();
             }
         } catch (Throwable e) {
             e.printStackTrace();
