@@ -20,8 +20,9 @@ import ${packageName}.filter.${filterName};
 public class ${className} implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ${interceptorName}()).addPathPatterns("/**");
-        WebMvcConfigurer.super.addInterceptors(registry);
+        registry.addInterceptor(new LogInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/swagger*/**", "/v3/**");
     }
 
     @Bean
