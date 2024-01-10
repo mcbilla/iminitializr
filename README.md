@@ -217,7 +217,7 @@ class AutoGeneratorTests {
 
 如果你觉得目前的功能还不能满足你的需求，iminitializr 支持通过插件的形式添加新的功能。插件接口是 `ExtensionHandler`。
 
-```
+```java
 public interface ExtensionHandler {
     /**
      * 是否启用插件，默认返回true
@@ -340,7 +340,7 @@ public class Myextension {
 }
 ```
 
-自定义插件就这么的简单！
+如果想禁用插件的话，只需要在 `enable()` 方法里面返回 false。自定义插件就这么的简单！
 
 # 感谢
 
