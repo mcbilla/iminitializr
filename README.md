@@ -109,7 +109,7 @@ CREATE TABLE `t_user` (
 git clone https://github.com/mcbilla/iminitializr.git
 ```
 
-3、执行以下命令
+3、打开项目，进入 `src/test/java/com.mcb.iminitializr` 目录，执行以下代码创建新的项目
 
 ```java
 class AutoGeneratorTests {
