@@ -126,6 +126,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
         this.outputFile(createFile(resourcePath, Constant.YML_TEMPLATE, null),
                 Constant.YML_TEMPLATE,
                 builder -> builder
+                        .put("applicationName", globalConfig.getArtifactId())
                         .put("url", dataSourceConfig.getUrl())
                         .put("username", dataSourceConfig.getUsername())
                         .put("password", dataSourceConfig.getPassword())
@@ -146,6 +147,11 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
         // 6、创建.gitignore
         this.outputFile(createFile(rootPath, Constant.GITIGNORE_TEMPLATE, null),
                 Constant.GITIGNORE_TEMPLATE,
+                null);
+
+        // 7、创建log4j2.xml
+        this.outputFile(createFile(resourcePath, Constant.LOG4J2_TEMPLATE, null),
+                Constant.LOG4J2_TEMPLATE,
                 null);
     }
 

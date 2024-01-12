@@ -26,6 +26,7 @@ public abstract class Constant {
     public static final String YML_TEMPLATE = "application.yml";
     public static final String POM_TEMPLATE = "pom.xml";
     public static final String GITIGNORE_TEMPLATE = ".gitignore";
+    public static final String LOG4J2_TEMPLATE = "log4j2.xml";
     public static final String RESULT_TEMPLATE = "result.java";
     public static final String RESULT_ENUM_TEMPLATE = "resultenum.java";
 

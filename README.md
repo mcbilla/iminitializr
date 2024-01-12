@@ -81,6 +81,8 @@ Aliyun Java Initializr 和 Spring Initializr 是同类的 Web 服务，是代码
 | lombok              | 1.8.26      |
 | swagger             | 3.0.0       |
 | hibernate-validator | 6.2.5.Final |
+| log4j2              | 2.17.2      |
+| hikari              | 4.0.3       |
 
 ## 三、Quick Start
 
