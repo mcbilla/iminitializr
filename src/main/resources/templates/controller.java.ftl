@@ -2,9 +2,12 @@ package ${package.Controller};
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import ${package.Entity}.${entity};
 import ${package.Service}.${table.serviceName};
 import ${package.Parent}.global.Result;
 <#if restControllerStyle>
@@ -44,8 +47,9 @@ public class ${table.controllerName} {
 
     @GetMapping(value = "/hello")
     @ApiOperation("hello")
-    public Result<String> hello() {
-        return Result.success("count: " + service.count());
+    public Result<PageInfo<${entity}>> hello() {
+        PageHelper.startPage(1, 10);
+        return Result.success(new PageInfo<>(service.list()));
     }
 }
 </#if>

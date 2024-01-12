@@ -76,23 +76,37 @@ Aliyun Java Initializr 和 Spring Initializr 是同类的 Web 服务，是代码
 | ------------------- | ----------- |
 | jdk                 | 1.8         |
 | spring-boot-starter | 2.7.2       |
-| mysql               | 8.0.13      |
-| mybatis-plus        | 3.5.3.1     |
 | lombok              | 1.8.26      |
 | swagger             | 3.0.0       |
 | hibernate-validator | 6.2.5.Final |
 | log4j2              | 2.17.2      |
 | hikari              | 4.0.3       |
+| mybatis-plus        | 3.5.3.1     |
+| mysql               | 8.0.13      |
+| pagehelper          | 1.4.7       |
+
+iminitializr 创建的项目提供以下特性：
+
+* **完整 MVC 结构的 Maven 项目。**
+* **全局异常处理。**
+* **全局请求参数拦截和打印。**
+* **统一日志格式打印。**
+* **支持 swagger api 文档。**
+* **支持 mybatis-plus 和查询分页。**
 
 ## 三、Quick Start
 
-1、创建测试表 `t_user`
+1、执行下面 sql 创建测试表 `t_user`
 
 ```sql
 CREATE DATABASE mydb;
 
 USE mydb;
 
+-- ----------------------------
+-- Table structure for t_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(64) DEFAULT NULL COMMENT '名字',
@@ -103,6 +117,13 @@ CREATE TABLE `t_user` (
   `update_time` timestamp NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of t_user
+-- ----------------------------
+BEGIN;
+INSERT INTO `t_user` VALUES (1, 'mcbilla', 18, 10.110000, 20.220000, '2023-11-24 22:06:23', '2024-01-12 14:27:47');
+COMMIT;
 ```
 
 2、下载 iminitializr 项目。
@@ -205,11 +226,42 @@ class AutoGeneratorTests {
 
 使用 IDE 打开，项目初始化完成后，执行 `MyTestApplication`，访问 http://localhost:8081/user/hello ，可以看到下面响应
 
-```
+```json
 {
   "code": 200,
   "message": "成功",
-  "data": "count: 1"
+  "data": {
+    "total": 1,
+    "list": [
+      {
+        "id": 1,
+        "name": "mcbilla",
+        "age": 18,
+        "lat": 10.11,
+        "lng": 20.22,
+        "addTime": "2023-11-24T22:06:23",
+        "updateTime": "2024-01-12T14:27:47"
+      }
+    ],
+    "pageNum": 1,
+    "pageSize": 10,
+    "size": 1,
+    "startRow": 1,
+    "endRow": 1,
+    "pages": 1,
+    "prePage": 0,
+    "nextPage": 0,
+    "isFirstPage": true,
+    "isLastPage": true,
+    "hasPreviousPage": false,
+    "hasNextPage": false,
+    "navigatePages": 8,
+    "navigatepageNums": [
+      1
+    ],
+    "navigateFirstPage": 1,
+    "navigateLastPage": 1
+  }
 }
 ```
 

@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+logs/
+*.DS_Store
+*.flattened-pom.xml

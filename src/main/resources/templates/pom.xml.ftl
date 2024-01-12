@@ -24,6 +24,7 @@
         <lombok.version>1.18.26</lombok.version>
         <swagger.version>3.0.0</swagger.version>
         <hibernate.validator.version>6.2.5.Final</hibernate.validator.version>
+        <pagehelper.version>1.4.7</pagehelper.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,13 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${r'${hibernate.validator.version}'}</version>
+        </dependency>
+
+        <!--pagehelper-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${r'${pagehelper.version}'}</version>
         </dependency>
     </dependencies>
 
