@@ -141,6 +141,7 @@ public abstract class AbstractTemplateEngine implements RuntimeFactory, Extensio
                         .put("version", globalConfig.getVersion())
                         .put("name", globalConfig.getName())
                         .put("description", globalConfig.getDescription())
+                        .put("applicationName", getPackage(PathEnum.pkg) + Constant.DOT + applicationName)
                         .build()
         );
 
